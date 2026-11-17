@@ -1,0 +1,6 @@
+TẠO FILE APK CÀI VÀO ĐIỆN THOẠI ANDROID
+1. Đăng ký tài khoản miễn phí tại github.com, rồi tạo một kho mới (New repository, chọn Private nếu muốn).
+2. Bấm "uploading an existing file", kéo thả TOÀN BỘ nội dung thư mục này vào (kể cả thư mục .github), rồi bấm Commit.
+3. Mở tab Actions, chọn "Build APK", bấm Run workflow. Đợi khoảng 5 đến 10 phút cho đến khi có dấu tick xanh.
+4. Bấm vào lần chạy vừa xong, tải mục "so-tro-apk" ở cuối trang, giải nén lấy app-debug.apk.
+5. Chép tệp sang điện thoại, mở lên và cho phép "Cài đặt ứng dụng không rõ nguồn gốc".
