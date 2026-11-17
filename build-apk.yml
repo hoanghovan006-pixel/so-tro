@@ -15,12 +15,14 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      - run: mkdir -p www assets && cp index.html www/index.html && cp icon-only.png icon-foreground.png icon-background.png splash.png splash-dark.png assets/
       - run: npm install
       - run: npx cap add android
-      - run: cp android-patch/MainActivity.java android/app/src/main/java/vn/sotro/app/MainActivity.java
+      - run: npx --yes @capacitor/assets@3 generate --android
+      - run: cp MainActivity.java android/app/src/main/java/vn/sotro/app/MainActivity.java
       - run: npx cap sync android
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
         with:
-          name: so-tro-apk
+          name: ht-group-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
