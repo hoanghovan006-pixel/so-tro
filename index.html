@@ -114,7 +114,7 @@ bill(){const L=rooms().filter(r=>r.tn);
   if(i){const s=st(i);return '<div class="card '+s[1]+'"><div class="row"><b>'+esc(r.name)+'</b><span class="chip '+s[1]+'">'+s[0]+'</span></div><div class="mu">Đã có hóa đơn '+vnd(i.total)+'</div></div>'}
   return '<div class="card"><b>'+esc(r.name)+'</b> <span class="mu">'+esc(r.tn)+'</span><div class="g2"><label>Điện (cũ '+r.e+')<input id="ne'+r.id+'" type="number" inputmode="decimal" placeholder="Số mới"></label><label>Nước (cũ '+r.w+')<input id="nw'+r.id+'" type="number" inputmode="decimal" placeholder="Số mới"></label></div>'+
   '<label class="ck"><input type="checkbox" id="re'+r.id+'">Vừa thay đồng hồ điện (số cũ tính là 0)</label><label class="ck"><input type="checkbox" id="rw'+r.id+'">Vừa thay đồng hồ nước (số cũ tính là 0)</label>'+
-  '<div class="g2"><label>Khoản phát sinh (đ)<input id="ex'+r.id+'" type="number" inputmode="decimal"></label><label>Ghi chú khoản đó<input id="en'+r.id+'"></label></div><button class="pr" onclick="mk(\''+r.id+'\')">Tạo hóa đơn</button></div>'}).join("")
+  (P().mg>0?'<label>Máy giặt: số người dùng (giá '+vnd(P().mg)+'/người)<input id="mg'+r.id+'" type="number" inputmode="decimal" value="'+(r.mg||0)+'"></label>':"")+(P().nb>0?'<label>Nước bình: số bình (giá '+vnd(P().nb)+'/bình)<input id="nb'+r.id+'" type="number" inputmode="decimal" placeholder="0"></label>':"")+(P().cs||[]).map((c,k)=>c.m==="q"?'<label>'+esc(c.n)+': số lượng (giá '+vnd(c.pr)+')<input id="cq'+r.id+'_'+k+'" type="number" inputmode="decimal" placeholder="0"></label>':"").join("")+'<div class="g2"><label>Khác: số tiền (đ)<input id="ex'+r.id+'" type="number" inputmode="decimal"></label><label>Khác: tên khoản<input id="en'+r.id+'"></label></div><button class="pr" onclick="mk(\''+r.id+'\')">Tạo hóa đơn</button></div>'}).join("")
   :'<p class="mu">Chưa có phòng nào đang thuê. Vào tab Phòng, thêm phòng và nhập tên khách thuê.</p>')},
 inv(){const L=S.inv.filter(i=>i.pid===P().id&&i.per===month);const t=L.reduce((s,i)=>s+i.total,0),pd=L.reduce((s,i)=>s+Math.min(i.paid,i.total),0);
  return '<h2>Hóa đơn tháng '+mf(month)+'</h2><div class="card">Tổng '+vnd(t)+'<br>Đã thu '+vnd(pd)+'<br><b>Còn phải thu '+vnd(t-pd)+'</b></div>'+
@@ -128,7 +128,7 @@ fin(){const p=P().id,I=S.inv.filter(i=>i.pid===p),X=S.exp.filter(x=>x.pid===p),y
  '<h3>Năm '+y+'</h3><div class="sc"><table><tr><th>Tháng</th><th>Thu</th><th>Chi</th><th>Lãi</th></tr>'+rows+'</table></div><p><button onclick="exportT()">Xuất bảng cho Excel</button></p>'},
 set(){const p=P();
  return '<h2>Cài đặt</h2><div class="card"><label>Tên nhà trọ<input id="sn" value="'+esc(p.name)+'"></label><label>Địa chỉ (in trên hóa đơn)<input id="sa" value="'+esc(p.ad||"")+'"></label><label>Số điện thoại chủ trọ<input id="sp" type="tel" value="'+esc(p.ph||"")+'"></label><label>Thông tin chuyển khoản (ngân hàng, số tài khoản, tên)<input id="sb" value="'+esc(p.bk||"")+'"></label><label>Lời nhắn cuối hóa đơn<input id="ss" value="'+esc(p.nt||"")+'"></label><div class="g2"><label>Giá điện (đ/số)<input id="se" type="number" inputmode="decimal" value="'+p.e+'"></label><label>Giá nước (đ)<input id="sw" type="number" inputmode="decimal" value="'+p.w+'"></label></div>'+
- '<label>Cách tính nước<select id="sm"><option value="unit"'+(p.wm==="unit"?" selected":"")+'>Theo số khối</option><option value="person"'+(p.wm==="person"?" selected":"")+'>Theo đầu người</option></select></label><div class="g2"><label>Tiền rác mỗi phòng (đ)<input id="st" type="number" inputmode="decimal" value="'+p.tr+'"></label><label>Internet mỗi phòng (đ)<input id="si" type="number" inputmode="decimal" value="'+p.net+'"></label></div><button class="pr" onclick="saveSet()">Lưu cài đặt</button></div>'+
+ '<label>Cách tính nước<select id="sm"><option value="unit"'+(p.wm==="unit"?" selected":"")+'>Theo số khối</option><option value="person"'+(p.wm==="person"?" selected":"")+'>Theo đầu người</option></select></label><div class="g2"><label>Tiền rác mỗi phòng (đ)<input id="st" type="number" inputmode="decimal" value="'+p.tr+'"></label><label>Internet mỗi phòng (đ)<input id="si" type="number" inputmode="decimal" value="'+p.net+'"></label></div><div class="g2"><label>Giá máy giặt (đ/người)<input id="smg" type="number" inputmode="decimal" value="'+(p.mg||0)+'"></label><label>Giá nước bình (đ/bình)<input id="snb" type="number" inputmode="decimal" value="'+(p.nb||0)+'"></label></div><button class="pr" onclick="saveSet()">Lưu cài đặt</button></div>'+'<h3>Dịch vụ khác</h3>'+(p.cs||[]).map((c,k)=>'<div class="card" onclick="csForm('+k+')"><div class="row"><span>'+esc(c.n)+'</span><span>'+vnd(c.pr)+(c.m==="q"?" / đơn vị":" / phòng")+'</span></div></div>').join("")+'<p class="mu">Bấm Lưu cài đặt trước khi thêm hoặc sửa dịch vụ khác.</p><button onclick="csForm()">+ Thêm dịch vụ khác</button>'+
  '<div class="bt"><button onclick="addProp()">+ Thêm nhà trọ</button>'+(S.props.length>1?'<button class="dg" onclick="delProp()">Xóa nhà này</button>':"")+'</div>'+
  '<h3>Sao lưu dữ liệu</h3><p class="mu">Dữ liệu được lưu ngay trên trình duyệt của máy này, dùng được khi không có mạng. Xóa dữ liệu trình duyệt sẽ mất hết, nên hãy sao lưu thường xuyên.</p><div class="bt"><button onclick="backup()">Sao lưu</button><button onclick="restore()">Khôi phục</button></div>'}
 };
@@ -151,7 +151,12 @@ function mk(id){const r=S.rooms.find(x=>x.id===id),p=P(),g=k=>$("#"+k+id);
  const ue=re?E:E-r.e,uw=rw?W:W-r.w,x=+g("ex").value||0,wp=p.wm==="person";
  const L=[["Tiền phòng","",r.rent],["Điện",(re?"đồng hồ mới 0":r.e)+" → "+E+", "+ue+" số × "+vnd(p.e),ue*p.e],
   ["Nước",wp?r.pp+" người × "+vnd(p.w):(rw?"đồng hồ mới 0":r.w)+" → "+W+", "+uw+" khối × "+vnd(p.w),wp?r.pp*p.w:uw*p.w]];
- if(p.tr)L.push(["Rác","",p.tr]);if(p.net)L.push(["Internet","",p.net]);if(x)L.push([g("en").value.trim()||"Phát sinh","",x]);
+ if(p.tr)L.push(["Rác","",p.tr]);if(p.net)L.push(["Internet","",p.net]);const mgN=g("mg")?+g("mg").value||0:0,nbN=g("nb")?+g("nb").value||0:0;
+ if(g("mg"))r.mg=mgN;
+ if(mgN>0)L.push(["Máy giặt",mgN+" người × "+vnd(p.mg),mgN*p.mg]);
+ if(nbN>0)L.push(["Nước bình",nbN+" bình × "+vnd(p.nb),nbN*p.nb]);
+ (p.cs||[]).forEach((c,k)=>{if(c.m==="q"){const q=+(($("#cq"+id+"_"+k)||{}).value)||0;if(q>0)L.push([c.n,q+" × "+vnd(c.pr),q*c.pr])}else if(c.pr>0)L.push([c.n,"",c.pr])});
+ if(x)L.push([g("en").value.trim()||"Khác","",x]);
  S.inv.push({id:uid(),rid:id,pid:p.id,per:month,L:L,total:L.reduce((s,l)=>s+l[2],0),paid:0,e0:r.e,e1:E,w0:r.w,w1:W});
  r.e=E;r.w=W;save();toast("Đã tạo hóa đơn "+r.name);render()}
 
@@ -175,7 +180,7 @@ function exportT(){const p=P().id,y=month.slice(0,4),I=S.inv.filter(i=>i.pid===p
  t+="\nPhòng\tTháng\tTổng\tĐã thu\n"+I.map(i=>rn(i.rid)+"\t"+i.per+"\t"+i.total+"\t"+Math.min(i.paid,i.total)).join("\n");
  showText("Bảng năm "+y,t,"Sao chép rồi dán vào Excel hoặc Google Sheets, các cột sẽ tự chia ô.")}
 
-function saveSet(){const p=P();p.name=$("#sn").value.trim()||p.name;p.ad=$("#sa").value.trim();p.ph=$("#sp").value.trim();p.bk=$("#sb").value.trim();p.nt=$("#ss").value.trim();p.e=+$("#se").value||0;p.w=+$("#sw").value||0;p.wm=$("#sm").value;p.tr=+$("#st").value||0;p.net=+$("#si").value||0;save();toast("Đã lưu cài đặt");render()}
+function saveSet(){const p=P();p.name=$("#sn").value.trim()||p.name;p.ad=$("#sa").value.trim();p.ph=$("#sp").value.trim();p.bk=$("#sb").value.trim();p.nt=$("#ss").value.trim();p.e=+$("#se").value||0;p.w=+$("#sw").value||0;p.wm=$("#sm").value;p.tr=+$("#st").value||0;p.net=+$("#si").value||0;p.mg=+$("#smg").value||0;p.nb=+$("#snb").value||0;save();toast("Đã lưu cài đặt");render()}
 function addProp(){modal("Thêm nhà trọ",fld("n","Tên nhà trọ","text",""),[["Hủy"],["Thêm","pr",m=>{const n=gv(m,"n").trim();if(!n){toast("Nhập tên nhà trọ");return false}const id=uid();S.props.push({id:id,name:n,e:3500,w:18000,wm:"unit",tr:0,net:0});S.cur=id;save();render()}]])}
 function delProp(){const p=P();ask("Xóa nhà "+esc(p.name)+" cùng toàn bộ phòng, hóa đơn và chi phí của nhà này?",()=>{S.rooms=S.rooms.filter(x=>x.pid!==p.id);S.inv=S.inv.filter(x=>x.pid!==p.id);S.exp=S.exp.filter(x=>x.pid!==p.id);S.props=S.props.filter(x=>x.id!==p.id);S.cur=S.props[0].id;save();render()})}
 function backup(){showText("Sao lưu dữ liệu",JSON.stringify(S),"Sao chép đoạn này và lưu vào ghi chú hoặc tin nhắn cho chính bạn. Dùng Khôi phục để nạp lại.")}
@@ -201,6 +206,11 @@ function printInv(i){const p=S.props.find(x=>x.id===i.pid)||P(),r=S.rooms.find(x
  '<div class="stt '+s[1]+'">'+(s[1]==="ok"?"ĐÃ THANH TOÁN":s[1]==="wn"?"Đã thu "+vnd(i.paid)+" · Còn phải thu "+vnd(rest):"CHƯA THANH TOÁN · Còn phải thu "+vnd(rest))+'</div>'+
  '<div class="ft">'+(p.bk?'<div><b>Chuyển khoản:</b> '+esc(p.bk)+'</div>':"")+'<div>'+esc(p.nt||"Cảm ơn quý khách đã thuê trọ.")+'</div><div class="sg"><div>Người lập hóa đơn</div><div>Khách thuê<br>(ký, ghi rõ họ tên)</div></div><div class="sm" style="text-align:right">Ngày in: '+dt+'</div></div></div>';
  document.body.append(o)}
+function csForm(k){const p=P();p.cs=p.cs||[];const c=k==null?{n:"",pr:0,m:"f"}:p.cs[k];
+ const b=[["Hủy"],["Lưu","pr",m=>{const n=gv(m,"n").trim();if(!n){toast("Nhập tên dịch vụ");return false}const d={n:n,pr:+gv(m,"pr")||0,m:gv(m,"m")};if(k==null)p.cs.push(d);else p.cs[k]=d;save();render()}]];
+ if(k!=null)b.splice(1,0,["Xóa","dg",()=>{p.cs.splice(k,1);save();render()}]);
+ const md=modal(k==null?"Thêm dịch vụ khác":"Sửa dịch vụ",fld("n","Tên dịch vụ (ví dụ: Gửi xe)","text",c.n)+fld("pr","Giá (đ)","number",c.pr)+'<label>Cách tính<select name="m"><option value="f">Cố định mỗi phòng, mỗi tháng</option><option value="q">Theo số lượng (nhập mỗi tháng)</option></select></label>',b);
+ md.querySelector('[name="m"]').value=c.m||"f"}
 render();
 </script>
 </body>
